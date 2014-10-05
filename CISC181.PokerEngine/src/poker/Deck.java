@@ -15,7 +15,7 @@ public class Deck {
 			eSuit SuitValue = eSuit.values()[i];			
 			for (short j = 0; j <= 12; j++) {
 				eRank RankValue = eRank.values()[j];				
-				Card NewCard = new Card(SuitValue,RankValue);
+				Card NewCard = new Card(SuitValue, RankValue);
 				MakingDeck.add(NewCard);
 			}
 		}
@@ -24,11 +24,40 @@ public class Deck {
 		
 		//	Set the instance variable
 		cards = MakingDeck;
+		ShuffleCards();
+	}
+	
+	public Deck (int NumberofJokers){
+		this();
 		
+		for (short i = 1; i <= NumberofJokers; i++){
+			cards.add(new Card(eSuit.JOKER, eRank.JOKER));
+		}
+		ShuffleCards();
+	}
+	
+	public Deck (int NumberofJokers, ArrayList<Card> WildCards){
+		this(NumberofJokers);
+		
+		for (Card deckCard: cards)
+		{
+			for (Card WildCard: WildCards)
+			{
+				if((deckCard.getSuit() == WildCard.getSuit()) &&
+						(deckCard.getRank() == WildCard.getRank()))
+								{
+									deckCard.setWild();
+								}
+			}		
+		}
+		ShuffleCards();
+	}
+		
+		private void ShuffleCards()
+		{
 		//	Shuffle the cards
 		Collections.shuffle(cards);
-		
-	}
+		}
 
 	public Card drawFromDeck() {
 		// Removes the first card from the deck and return the card
