@@ -18,6 +18,7 @@ public class Hand {
 	private boolean Flush;
 	private boolean Straight;
 	private boolean Ace;
+	private boolean Joker;
 	private static Deck dJoker = new Deck();
 
 	public Hand(Deck d) {
@@ -26,8 +27,19 @@ public class Hand {
 			Import.add(d.drawFromDeck());
 		}
 		CardsInHand = Import;
+		
+		HandleJokersWilds();
 	}
 
+	
+	public Hand(ArrayList<Card> setCards){
+		this.CardsInHand = setCards;
+	}
+	
+	public ArrayList<Card> setBestHand() {
+		return BestCardsInHand;
+	}
+	
 	public ArrayList<Card> getCards() {
 		return CardsInHand;
 	}
@@ -72,14 +84,16 @@ public class Hand {
 		Collections.sort(PlayersHand, Hand.HandRank);
 
 		SetNatural();
-
-		this.setBestHand(PlayersHand.get(0).getCards());
+		BestCardsInHand = PlayersHand.get(0).getCards();
+		this.setBestHand();
 		this.HandStrength = PlayersHand.get(0).getHandStrength();
 		this.HiHand = PlayersHand.get(0).getHighPairStrength();
 		this.LoHand = PlayersHand.get(0).getLowPairStrength();
 		this.Kicker = PlayersHand.get(0).getKicker();
 
 	}
+
+
 	private static ArrayList<Hand> ExplodeHands(ArrayList<Hand> inHands, int SubCardNumber){
 		
 		ArrayList<Hand> SubHands = new ArrayList<Hand>();
@@ -107,6 +121,7 @@ public class Hand {
 				SubHands.add(h);
 			}
 		}
+		return SubHands;
 	}
 	
 	public static Hand EvalHand(ArrayList<Card> SeededHand) {
@@ -118,32 +133,32 @@ public class Hand {
 		return h;
 	}
 
-	public void jokerEval() {
-
-		// Joker Detector
-		Collections.sort(CardsInHand, Card.CardRank);
-		if (CardsInHand.get(eCardNo.FirstCard.getCardNo()).getRank() == eRank.JOKER) {
-			Joker = true;
-		}
-		if (Joker) {
-			int[] jokerScores = new int[52];
-			for (int i = 0; i < 52; i++) {
-				// NEW DECK AND HAND WITHOUT JOKER
-				Deck jokerDeck = new Deck();
-				ArrayList<Card> jokerHand = new ArrayList<Card>();
-				jokerHand = CardsInHand;
-				jokerHand.remove(0);
-				// REPLACEMENT CARD FOR JOKER
-				Card jokerCard = jokerDeck.drawFromDeck();
-				// ADDS REPLACEMENT CARD TO DECK AND SORTS THE DECK
-				jokerHand.add(jokerCard);
-				Collections.sort(CardsInHand, Card.CardRank);
-
-				// FROM HERE WE WANT TO SCORE JOKERHAND FOR EACH CARD -> ADD
-				// SCORE TO JOKERSCORES -> SORT AND RETRIEVE HIGHEST SCORE
-			}
-		}
-	}
+//	public void jokerEval() {
+//
+//		// Joker Detector
+//		Collections.sort(CardsInHand, Card.CardRank);
+//		if (CardsInHand.get(eCardNo.FirstCard.getCardNo()).getRank() == eRank.JOKER) {
+//			Joker = true;
+//		}
+//		if (Joker) {
+//			int[] jokerScores = new int[52];
+//			for (int i = 0; i < 52; i++) {
+//				// NEW DECK AND HAND WITHOUT JOKER
+//				Deck jokerDeck = new Deck();
+//				ArrayList<Card> jokerHand = new ArrayList<Card>();
+//				jokerHand = CardsInHand;
+//				jokerHand.remove(0);
+//				// REPLACEMENT CARD FOR JOKER
+//				Card jokerCard = jokerDeck.drawFromDeck();
+//				// ADDS REPLACEMENT CARD TO DECK AND SORTS THE DECK
+//				jokerHand.add(jokerCard);
+//				Collections.sort(CardsInHand, Card.CardRank);
+//
+//				// FROM HERE WE WANT TO SCORE JOKERHAND FOR EACH CARD -> ADD
+//				// SCORE TO JOKERSCORES -> SORT AND RETRIEVE HIGHEST SCORE
+//			}
+//		}
+//	}
 
 	public void EvalHand() {
 		// Evaluates if the hand is a flush and/or straight then figures out
@@ -422,6 +437,9 @@ public class Hand {
 				this.Natural = 0;
 			}
 		}
+	}
+	public int getNatural(){
+		return this.Natural;
 	}
 
 	private void ScoreHand(eHandStrength hST, int HiHand, int LoHand, int Kicker) {
